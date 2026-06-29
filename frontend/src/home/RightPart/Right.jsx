@@ -5,7 +5,7 @@ import TypeSend from './TypeSend';
 import useConversation from '../../zustand/useConversation';
 
 const Right = ({ authUser, messages, users, onlineUsers }) => {
-  const { selectedConversation } = useConversation();
+  const { selectedConversation, removeMessageFromConversation } = useConversation();
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const Right = ({ authUser, messages, users, onlineUsers }) => {
     <section className="flex flex-1 flex-col bg-slate-900/70">
       <ChatUser user={receiver || selectedConversation} isOnline={isOnline} />
       <div ref={scrollRef} className="scrollbar-thin flex-1 overflow-y-auto px-4 py-4">
-        <Messages messages={messages} authUser={authUser} />
+        <Messages messages={messages} authUser={authUser} onDeleteMessage={(id) => removeMessageFromConversation(selectedConversation._id, id)} />
       </div>
       <TypeSend authUser={authUser} receiverId={selectedConversation._id} />
     </section>

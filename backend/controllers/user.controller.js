@@ -24,7 +24,7 @@ export const signup = async (req, res) => {
       return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
-    const newUser = await User.create({ fullName, email, password });
+    const newUser = await User.create({ fullName, email, password, profilePic: req.body.profilePic || '' });
 
     const token = generateToken(newUser._id);
     res.cookie('jwt', token, {
@@ -41,6 +41,7 @@ export const signup = async (req, res) => {
         _id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
+        profilePic: newUser.profilePic || '',
       },
     });
   } catch (error) {
@@ -81,6 +82,7 @@ export const login = async (req, res) => {
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
+        profilePic: user.profilePic || '',
       },
     });
   } catch (error) {
@@ -101,6 +103,22 @@ export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.user._id } }).select('-password');
     return res.status(200).json({ success: true, users });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+
+    if (!profilePic) {
+      return res.status(400).json({ success: false, message: 'Profile picture is required' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, { profilePic }, { new: true }).select('-password');
+
+    return res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

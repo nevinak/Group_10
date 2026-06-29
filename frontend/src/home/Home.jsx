@@ -12,7 +12,7 @@ const Home = () => {
   const { socket, onlineUsers } = useSocket();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const { selectedConversation, messages, setMessages, appendMessage } = useConversation();
+  const { selectedConversation, messages, setMessagesForConversation, appendMessageToConversation } = useConversation();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -32,23 +32,24 @@ const Home = () => {
       if (!selectedConversation) return;
       try {
         const { data } = await axios.get(`/api/messages/get/${selectedConversation._id}`, { withCredentials: true });
-        if (data.success) setMessages(data.messages);
+        if (data.success) setMessagesForConversation(selectedConversation._id, data.messages);
       } catch {
         toast.error('Failed to load messages');
       }
     };
 
     fetchMessages();
-  }, [selectedConversation, setMessages]);
+  }, [selectedConversation, setMessagesForConversation]);
 
   useEffect(() => {
     if (!socket) return;
 
     const handleIncomingMessage = (payload) => {
       if (payload.senderId === authUser?._id) return;
-      if (selectedConversation?._id === payload.senderId || selectedConversation?._id === payload.receiverId) {
-        appendMessage(payload);
-      } else {
+      const conversationId = payload.senderId;
+      appendMessageToConversation(conversationId, payload);
+
+      if (selectedConversation?._id !== conversationId) {
         toast('New message received', { icon: '💬' });
       }
 
@@ -59,7 +60,7 @@ const Home = () => {
 
     socket.on('newMessage', handleIncomingMessage);
     return () => socket.off('newMessage', handleIncomingMessage);
-  }, [appendMessage, authUser?._id, selectedConversation?._id, socket]);
+  }, [appendMessageToConversation, authUser?._id, selectedConversation?._id, socket]);
 
   const filteredUsers = users.filter((user) => user.fullName.toLowerCase().includes(searchTerm.toLowerCase()));
 

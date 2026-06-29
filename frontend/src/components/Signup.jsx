@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -7,6 +8,7 @@ import { useAuth } from '../context/AuthProvider';
 const Signup = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [previewPic, setPreviewPic] = useState('');
   const {
     register,
     handleSubmit,
@@ -14,9 +16,19 @@ const Signup = () => {
     formState: { errors },
   } = useForm();
 
+  const handlePhotoPick = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => setPreviewPic(reader.result);
+    reader.readAsDataURL(file);
+  };
+
   const onSubmit = async (data) => {
     try {
-      const { data: response } = await axios.post('/api/auth/signup', data, { withCredentials: true });
+      const payload = { ...data, profilePic: previewPic };
+      const { data: response } = await axios.post('/api/auth/signup', payload, { withCredentials: true });
       if (response.success) {
         login(response.user);
         toast.success('Account created');
@@ -34,6 +46,14 @@ const Signup = () => {
         <p className="mt-2 text-sm text-slate-400">Start chatting in seconds.</p>
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex items-center gap-3">
+            <label className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border border-dashed border-slate-700 bg-slate-950 text-sm text-slate-400">
+              {previewPic ? <img src={previewPic} alt="preview" className="h-full w-full rounded-full object-cover" /> : 'Pic'}
+              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoPick} />
+            </label>
+            <p className="text-sm text-slate-400">Add a profile picture</p>
+          </div>
+
           <input className="input input-bordered w-full bg-slate-950" placeholder="Full name" {...register('fullName', { required: 'Full name is required' })} />
           {errors.fullName && <p className="text-sm text-rose-400">{errors.fullName.message}</p>}
 
