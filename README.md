@@ -1,52 +1,61 @@
-# Group_10
-# Link Vault — Frontend
+# Chat App — Frontend
 
-React single-page app for Link Vault. Built with Vite, React Router, shadcn/ui, and Clerk. Talks to the Express backend over HTTP.
+React and Vite app for Chat App, a simple personal dashboard for saving, organizing, and revisiting links.
+
+## What this app does
+
+- Lets users sign in with Clerk.
+- Displays a dashboard for managing saved links.
+- Supports creating and organizing collections.
+- Allows users to mark links as favorites.
+- Helps users group links with tags and search by title, URL, or tag.
+
+## Tech stack
+
+- React
+- React Router
+- Vite
+- Tailwind CSS and shadcn/ui
+- Clerk authentication
 
 ## Prerequisites
 
 - Node.js 22+
-- A [Clerk](https://clerk.com) account (the same application you set up for the backend).
-- The backend running. By default this app expects it at `http://localhost:3000`.
+- A [Clerk](https://clerk.com) account
+- The backend running at `http://localhost:3000`
 
 ## Setup
 
-Install dependencies first. (If you've used a Node project before, you know the command.)
+1. Install dependencies:
 
-Create a `.env` file in this folder. Use `.env.example` for the variable names. Vite only exposes variables that start with `VITE_`, so the names matter:
+```bash
+npm install
+```
 
-- `VITE_CLERK_PUBLISHABLE_KEY` — your Clerk **publishable** key (Clerk Dashboard → API keys). This one is safe in the browser; never put the secret key here.
-- `VITE_API_URL` — the backend base URL, e.g. `http://localhost:3000`.
+2. Create a `.env` file in this folder:
 
-Start the dev server:
+```env
+VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
+VITE_API_URL="http://localhost:3000"
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open the URL it prints, sign in through Clerk, and you're in.
+4. Open the local URL shown by Vite and sign in.
 
-## How it fits together
+## Project structure
 
-- `src/main.jsx` wraps the app in `ClerkProvider` (auth), `BrowserRouter` (routing), and `TooltipProvider` (shadcn).
-- `src/App.jsx` holds the route table. Protected pages sit behind `ProtectedRoute`.
-- `src/lib/api.js` is a small fetch wrapper that attaches the Clerk token to every request.
-- Pages live in `src/pages/`, shared UI in `src/components/`, and shadcn primitives in `src/components/ui/`.
-
-## Your task
-
-`src/pages/Tags.jsx` is a placeholder. Build it to list the user's tags and let them delete (and ideally rename) one. It pairs with the tags routes you implement on the backend. The file has hints pointing to the existing pages whose patterns you can copy.
-
-## Useful docs
-
-- **React Router (declarative):** https://reactrouter.com/start/declarative/routing
-- **Clerk React quickstart:** https://clerk.com/docs/quickstarts/react
-- **shadcn/ui components:** https://ui.shadcn.com/docs/components
-- **Phosphor icons:** https://phosphoricons.com
-- **Vite env variables:** https://vite.dev/guide/env-and-mode
-- **useReducer:** https://react.dev/reference/react/useReducer
+- `src/main.jsx` sets up Clerk, routing, and UI providers.
+- `src/App.jsx` defines the app routes.
+- `src/pages/` contains the main pages such as Dashboard, Links, Favorites, Tags, and Collections.
+- `src/components/` contains shared UI and form components.
+- `src/lib/api.js` sends authenticated requests to the backend.
 
 ## Notes
 
-- Keep `.env` out of version control. Only `.env.example` should be committed.
-- If requests fail with 401, check that the backend is running and `VITE_API_URL` points at it.
+- Keep `.env` out of version control.
+- If requests return `401`, make sure the backend is running and `VITE_API_URL` points to the correct server.
